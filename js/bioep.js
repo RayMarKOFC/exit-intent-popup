@@ -18,6 +18,7 @@ window.bioEp = {
 	cookieExp: 30,
 	showOncePerSession: false,
 	onPopup: null,
+	onClose: null,
 	closeOnBackgroundClick: false,
 	
 	// Object for handling cookies, taken from QuirksMode
@@ -167,6 +168,10 @@ window.bioEp = {
 
 		// Set body overflow back to default to show scrollbars
 		document.body.style.overflow = this.overflowDefault;
+		
+		if(typeof this.onClose === "function") {
+			this.onClose();
+		}
 	},
 
 	// Handle scaling the popup
@@ -279,6 +284,7 @@ window.bioEp = {
 		this.cookieExp = (typeof opts.cookieExp === 'undefined') ? this.cookieExp : opts.cookieExp;
 		this.showOncePerSession = (typeof opts.showOncePerSession === 'undefined') ? this.showOncePerSession : opts.showOncePerSession;
 		this.onPopup = (typeof opts.onPopup === 'undefined') ? this.onPopup : opts.onPopup;
+		this.onClose = (typeof opts.onClose === 'undefined') ? this.onClose : opts.onClose;
 		this.closeOnBackgroundClick = (typeof opts.closeOnBackgroundClick === 'undefined') ? this.closeOnBackgroundClick : opts.closeOnBackgroundClick;
 	},
 
