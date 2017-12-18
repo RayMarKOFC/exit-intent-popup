@@ -94,7 +94,8 @@ window.bioEp = {
 		var css = document.createTextNode(
 			"#bio_ep_bg {display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; opacity: 0.3; z-index: 10001;}" +
 			"#bio_ep {display: none; position: fixed; width: " + this.width + "px; height: " + this.height + "px; font-family: 'Titillium Web', sans-serif; font-size: 16px; left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%); -webkit-transform: translateX(-50%) translateY(-50%); -ms-transform: translateX(-50%) translateY(-50%); background-color: #fff; box-shadow: 0px 1px 4px 0 rgba(0,0,0,0.5); z-index: 10002;}" +
-			"#bio_ep_close {position: absolute; left: 100%; margin: -8px 0 0 -12px; width: 20px; height: 20px; color: #fff; font-size: 12px; font-weight: bold; text-align: center; border-radius: 50%; background-color: #5c5c5c; cursor: pointer;}" +
+			"#bio_ep_close {position: absolute; left: 100%; margin: -8px 0 0 -12px; width: 20px; height: 20px; stroke: #fff; fill: #5c5c5c; cursor: pointer;}" +
+			"#bio_ep_close:hover, #bio_ep_close:active {fill: #444;}" +
 			this.css
 		);
 
@@ -131,7 +132,11 @@ window.bioEp = {
 		else {
 			this.closeBtnEl = document.createElement("div");
 			this.closeBtnEl.id = "bio_ep_close";
-			this.closeBtnEl.appendChild(document.createTextNode("×"));
+			this.closeBtnEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+				'<circle cx="50" cy="50" r="50" stroke-width="0" />' +
+				'<line x1="32" y1="32" x2="68" y2="68" stroke-width="10" stroke-linecap="square" />' +
+				'<line x1="32" y1="68" x2="68" y2="32" stroke-width="10" stroke-linecap="square" />' +
+				'</svg>';
 			this.popupEl.insertBefore(this.closeBtnEl, this.popupEl.firstChild);
 		}
 	},
