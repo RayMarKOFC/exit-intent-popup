@@ -16,6 +16,7 @@ window.bioEp = {
 	delay: 5,
 	showOnDelay: false,
 	cookieExp: 30,
+	cookieName: "bioep_shown",
 	showOncePerSession: false,
 	onPopup: null,
 	onClose: null,
@@ -59,22 +60,22 @@ window.bioEp = {
 		}
 	},
 	
-	// Handle the bioep_shown cookie
+	// Handle the cookie
 	// If present and true, return true
 	// If not present or false, create and return false
 	checkCookie: function() {
 		// Handle cookie reset
 		if(this.cookieExp <= 0) {
 			// Handle showing pop up once per browser session.
-			if(this.showOncePerSession && this.cookieManager.get("bioep_shown_session") == "true")
+			if(this.showOncePerSession && this.cookieManager.get(this.cookieName + "_session") == "true")
 				return true;
 
-			this.cookieManager.erase("bioep_shown");
+			this.cookieManager.erase(this.cookieName);
 			return false;
 		}
 
 		// If cookie is set to true
-		if(this.cookieManager.get("bioep_shown") == "true")
+		if(this.cookieManager.get(this.cookieName) == "true")
 			return true;
 
 		return false;
@@ -153,8 +154,8 @@ window.bioEp = {
 
 		this.shown = true;
 		
-		this.cookieManager.create("bioep_shown", "true", this.cookieExp, false);
-		this.cookieManager.create("bioep_shown_session", "true", 0, true);
+		this.cookieManager.create(this.cookieName, "true", this.cookieExp, false);
+		this.cookieManager.create(this.cookieName + "_session", "true", 0, true);
 		
 		if(typeof this.onPopup === "function") {
 			this.onPopup();
@@ -282,6 +283,7 @@ window.bioEp = {
 		this.delay = (typeof opts.delay === 'undefined') ? this.delay : opts.delay;
 		this.showOnDelay = (typeof opts.showOnDelay === 'undefined') ? this.showOnDelay : opts.showOnDelay;
 		this.cookieExp = (typeof opts.cookieExp === 'undefined') ? this.cookieExp : opts.cookieExp;
+		this.cookieName = (typeof opts.cookieName === 'undefined') ? this.cookieName : opts.cookieName;
 		this.showOncePerSession = (typeof opts.showOncePerSession === 'undefined') ? this.showOncePerSession : opts.showOncePerSession;
 		this.onPopup = (typeof opts.onPopup === 'undefined') ? this.onPopup : opts.onPopup;
 		this.onClose = (typeof opts.onClose === 'undefined') ? this.onClose : opts.onClose;
