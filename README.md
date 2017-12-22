@@ -102,6 +102,7 @@ Name | Type | Default | Description
 **cookieName** | string | bioep_shown | The name of the cookie. This should be set uniquely for different instances of the popup.
 **showOncePerSession** | boolean | false | If true, the popup will only show once per browser session. If false and cookieExp is set to 0, the popup will show multiple times in a single browser session.
 **onPopup** | function | null | A callback function to be called when the popup is displayed in the browser.
+**onClose** | function | null | A callback function to be called when the popup is closed by the user.
 **closeOnBackgroundClick** | boolean | false | If true, the popup will close when the user clicks the background.
 
 # License
