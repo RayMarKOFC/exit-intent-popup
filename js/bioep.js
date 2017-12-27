@@ -16,6 +16,7 @@ window.bioEp = {
 	delay: 5,
 	showOnDelay: false,
 	showOnIdle: false,
+	idleTimeout: 10,
 	cookieExp: 30,
 	cookieName: "bioep_shown",
 	showOncePerSession: false,
@@ -284,6 +285,7 @@ window.bioEp = {
 		this.delay = (typeof opts.delay === 'undefined') ? this.delay : opts.delay;
 		this.showOnDelay = (typeof opts.showOnDelay === 'undefined') ? this.showOnDelay : opts.showOnDelay;
 		this.showOnIdle = (typeof opts.showOnIdle === 'undefined') ? this.showOnIdle : opts.showOnIdle;
+		this.idleTimeout = (typeof opts.idleTimeout === 'undefined') ? this.idleTimeout : opts.idleTimeout;
 		this.cookieExp = (typeof opts.cookieExp === 'undefined') ? this.cookieExp : opts.cookieExp;
 		this.cookieName = (typeof opts.cookieName === 'undefined') ? this.cookieName : opts.cookieName;
 		this.showOncePerSession = (typeof opts.showOncePerSession === 'undefined') ? this.showOncePerSession : opts.showOncePerSession;
