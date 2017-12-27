@@ -15,6 +15,7 @@ window.bioEp = {
 	fonts: [],
 	delay: 5,
 	showOnDelay: false,
+	showOnIdle: false,
 	cookieExp: 30,
 	cookieName: "bioep_shown",
 	showOncePerSession: false,
@@ -282,6 +283,7 @@ window.bioEp = {
 		this.fonts = (typeof opts.fonts === 'undefined') ? this.fonts : opts.fonts;
 		this.delay = (typeof opts.delay === 'undefined') ? this.delay : opts.delay;
 		this.showOnDelay = (typeof opts.showOnDelay === 'undefined') ? this.showOnDelay : opts.showOnDelay;
+		this.showOnIdle = (typeof opts.showOnIdle === 'undefined') ? this.showOnIdle : opts.showOnIdle;
 		this.cookieExp = (typeof opts.cookieExp === 'undefined') ? this.cookieExp : opts.cookieExp;
 		this.cookieName = (typeof opts.cookieName === 'undefined') ? this.cookieName : opts.cookieName;
 		this.showOncePerSession = (typeof opts.showOncePerSession === 'undefined') ? this.showOncePerSession : opts.showOncePerSession;
