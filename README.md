@@ -8,7 +8,7 @@ exit-intent-popup
 * Support for embeddable CSS fonts, including Google Fonts.
 * Cookie support with optional expiry date and custom name.
 * Set a timed delay before the script starts tracking exit intent.
-* Display popup based on exit intent or timed delay.
+* Display popup based on exit intent, idle timeout, or timed delay.
 * Scales to adjust to window size.
 
 # Usage
@@ -96,8 +96,10 @@ Name | Type | Default | Description
 **html** | string | blank | The HTML code to be placed within the popup. HTML can be added through this function or on the page itself within a element.
 **css** | string | blank | The CSS styles for the popup. CSS can be added through this function or on the page itself.
 **fonts** | array | null | An array containing URLs that link to font stylesheets. Google Fonts was the main idea behind this feature.
-**delay** | integer| 5 | The time, in seconds, until the popup activates and begins watching for exit intent. If showOnDelay is set to true, this will be the time until the popup shows.
+**delay** | integer | 5 | The time, in seconds, until the popup activates and begins watching for exit intent. If showOnDelay is set to true, this will be the time until the popup shows.
 **showOnDelay** | boolean | false | If true, the popup will show after the delay option time. If false, popup will show when a visitor moves their cursor above the document window, showing exit intent.
+**showOnIdle** | boolean | false | If true, the popup will show after the user stops interacting with the page for the length of time defined in the idleTimeout option.
+**idleTimeout** | integer | 10 | The time, in seconds, until the user is determined as idle and shows the popup.
 **cookieExp** | integer | 30 | The number of days to set the cookie for. A cookie is used to track if the popup has already been shown to a specific visitor. If the popup has been shown, it will not show again until the cookie expires. A value of 0 will always show the popup.
 **cookieName** | string | bioep_shown | The name of the cookie. This should be set uniquely for different instances of the popup.
 **showOncePerSession** | boolean | false | If true, the popup will only show once per browser session. If false and cookieExp is set to 0, the popup will show multiple times in a single browser session.

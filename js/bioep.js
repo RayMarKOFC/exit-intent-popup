@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global bioEp */
+
 window.bioEp = {
 	// Private variables
 	bgEl: {},
@@ -6,6 +9,7 @@ window.bioEp = {
 	shown: false,
 	overflowDefault: "visible",
 	transformDefault: "",
+	idleTimeoutID: null,
 	
 	// Popup options
 	width: 400,
@@ -15,6 +19,8 @@ window.bioEp = {
 	fonts: [],
 	delay: 5,
 	showOnDelay: false,
+	showOnIdle: false,
+	idleTimeout: 10,
 	cookieExp: 30,
 	cookieName: "bioep_shown",
 	showOncePerSession: false,
@@ -254,6 +260,35 @@ window.bioEp = {
 			if(!from)
 				bioEp.showPopup();
 		}.bind(this));
+		
+		// Idle detection timer function
+		var idleStart = function() {
+			if (this.shown) return;
+			this.idleTimeoutID = setTimeout(this.showPopup.bind(this), this.idleTimeout * 1000);
+		}.bind(this);
+
+		var idleReset = function() {
+			if (this.shown) return;
+			clearTimeout(this.idleTimeoutID);
+			this.idleTimeoutID = null;
+			idleStart();
+		}.bind(this);
+		
+		// Track user interaction events for idle timeout
+		if(this.showOnIdle) {
+			this.addEvent(document, "mousemove", idleReset);
+			this.addEvent(document, "mousedown", idleReset);
+			this.addEvent(document, "touchstart", idleReset);
+			this.addEvent(document, "click", idleReset);
+			this.addEvent(document, "scroll", idleReset);
+			this.addEvent(document, "keypress", idleReset);
+			this.addEvent(document, "DOMMouseScroll", idleReset);
+			this.addEvent(document, "mousewheel", idleReset);
+			this.addEvent(document, "touchmove", idleReset);
+			this.addEvent(document, "MSPointerMove", idleReset);
+			
+			idleStart();
+		}
 
 		// Handle the popup close button
 		this.addEvent(this.closeBtnEl, "click", function() {
@@ -282,6 +317,8 @@ window.bioEp = {
 		this.fonts = (typeof opts.fonts === 'undefined') ? this.fonts : opts.fonts;
 		this.delay = (typeof opts.delay === 'undefined') ? this.delay : opts.delay;
 		this.showOnDelay = (typeof opts.showOnDelay === 'undefined') ? this.showOnDelay : opts.showOnDelay;
+		this.showOnIdle = (typeof opts.showOnIdle === 'undefined') ? this.showOnIdle : opts.showOnIdle;
+		this.idleTimeout = (typeof opts.idleTimeout === 'undefined') ? this.idleTimeout : opts.idleTimeout;
 		this.cookieExp = (typeof opts.cookieExp === 'undefined') ? this.cookieExp : opts.cookieExp;
 		this.cookieName = (typeof opts.cookieName === 'undefined') ? this.cookieName : opts.cookieName;
 		this.showOncePerSession = (typeof opts.showOncePerSession === 'undefined') ? this.showOncePerSession : opts.showOncePerSession;
