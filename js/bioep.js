@@ -6,6 +6,7 @@ window.bioEp = {
 	shown: false,
 	overflowDefault: "visible",
 	transformDefault: "",
+	idleTimeoutID: null,
 	
 	// Popup options
 	width: 400,
@@ -256,6 +257,35 @@ window.bioEp = {
 			if(!from)
 				bioEp.showPopup();
 		}.bind(this));
+		
+		// Idle detection timer function
+		var idleStart = function() {
+			if (this.shown) return;
+			this.idleTimeoutID = setTimeout(this.showPopup.bind(this), this.idleTimeout * 1000);
+		}.bind(this);
+
+		var idleReset = function() {
+			if (this.shown) return;
+			clearTimeout(this.idleTimeoutID);
+			this.idleTimeoutID = null;
+			idleStart();
+		}.bind(this);
+		
+		// Track user interaction events for idle timeout
+		if(this.showOnIdle) {
+			this.addEvent(document, "mousemove", idleReset);
+			this.addEvent(document, "mousedown", idleReset);
+			this.addEvent(document, "touchstart", idleReset);
+			this.addEvent(document, "click", idleReset);
+			this.addEvent(document, "scroll", idleReset);
+			this.addEvent(document, "keypress", idleReset);
+			this.addEvent(document, "DOMMouseScroll", idleReset);
+			this.addEvent(document, "mousewheel", idleReset);
+			this.addEvent(document, "touchmove", idleReset);
+			this.addEvent(document, "MSPointerMove", idleReset);
+			
+			idleStart();
+		}
 
 		// Handle the popup close button
 		this.addEvent(this.closeBtnEl, "click", function() {
