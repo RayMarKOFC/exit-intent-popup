@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global bioEp */
+
 window.bioEp = {
 	// Private variables
 	bgEl: {},
