@@ -312,6 +312,9 @@ window.bioEp = {
 			this.showPopup();
 		}.bind(this);
 		
+		// Track if user is using a touch device, then enable the idle listener
+		this.addEvent(document, 'touchstart', idleListen);
+		
 		// Track user interaction events for idle timeout
 		if(this.showOnIdle) {
 			idleListen();
