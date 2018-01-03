@@ -309,7 +309,7 @@ window.bioEp = {
 			this.removeEvent(document, "touchmove", idleReset);
 			this.removeEvent(document, "MSPointerMove", idleReset);
 			
-			this.showPopup();
+			this.showPopup().bind(this);
 		}.bind(this);
 		
 		// Track if user is using a touch device, then enable the idle listener
@@ -334,8 +334,8 @@ window.bioEp = {
 
 		// Handle window resizing
 		this.addEvent(window, "resize", function() {
-			bioEp.scalePopup();
-		});
+			this.scalePopup();
+		}.bind(this));
 	},
 
 	// Set user defined options for the popup
