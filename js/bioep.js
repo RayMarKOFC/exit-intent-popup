@@ -230,6 +230,12 @@ window.bioEp = {
 		else if(obj.attachEvent)
 			obj.attachEvent("on" + event, callback);
 	},
+	removeEvent: function (obj, event, callback) {
+		if(obj.removeEventListener)
+			obj.removeEventListener(event, callback, false);
+		else if(obj.detachEvent)
+			obj.detachEvent("on" + event, callback);
+	},
 
 	// Load event listeners for the popup
 	loadEvents: function() {
@@ -262,20 +268,9 @@ window.bioEp = {
 		}.bind(this));
 		
 		// Idle detection timer function
-		var idleStart = function() {
-			if (this.shown) return;
-			this.idleTimeoutID = setTimeout(this.showPopup.bind(this), this.idleTimeout * 1000);
-		}.bind(this);
-
-		var idleReset = function() {
-			if (this.shown) return;
-			clearTimeout(this.idleTimeoutID);
-			this.idleTimeoutID = null;
-			idleStart();
-		}.bind(this);
-		
-		// Track user interaction events for idle timeout
-		if(this.showOnIdle) {
+		var idleListen = function() {
+			this.removeEvent(document, 'touchstart', idleListen);
+			
 			this.addEvent(document, "mousemove", idleReset);
 			this.addEvent(document, "mousedown", idleReset);
 			this.addEvent(document, "touchstart", idleReset);
@@ -288,6 +283,41 @@ window.bioEp = {
 			this.addEvent(document, "MSPointerMove", idleReset);
 			
 			idleStart();
+		}.bind(this);
+		
+		var idleStart = function() {
+			if (this.shown) return;
+			this.idleTimeoutID = setTimeout(idleFire, this.idleTimeout * 1000);
+		}.bind(this);
+
+		var idleReset = function() {
+			if (this.shown) return;
+			clearTimeout(this.idleTimeoutID);
+			this.idleTimeoutID = null;
+			idleStart();
+		}.bind(this);
+		
+		var idleFire = function() {
+			this.removeEvent(document, "mousemove", idleReset);
+			this.removeEvent(document, "mousedown", idleReset);
+			this.removeEvent(document, "touchstart", idleReset);
+			this.removeEvent(document, "click", idleReset);
+			this.removeEvent(document, "scroll", idleReset);
+			this.removeEvent(document, "keypress", idleReset);
+			this.removeEvent(document, "DOMMouseScroll", idleReset);
+			this.removeEvent(document, "mousewheel", idleReset);
+			this.removeEvent(document, "touchmove", idleReset);
+			this.removeEvent(document, "MSPointerMove", idleReset);
+			
+			this.showPopup().bind(this);
+		}.bind(this);
+		
+		// Track if user is using a touch device, then enable the idle listener
+		this.addEvent(document, 'touchstart', idleListen);
+		
+		// Track user interaction events for idle timeout
+		if(this.showOnIdle) {
+			idleListen();
 		}
 
 		// Handle the popup close button
@@ -304,8 +334,8 @@ window.bioEp = {
 
 		// Handle window resizing
 		this.addEvent(window, "resize", function() {
-			bioEp.scalePopup();
-		});
+			this.scalePopup();
+		}.bind(this));
 	},
 
 	// Set user defined options for the popup
