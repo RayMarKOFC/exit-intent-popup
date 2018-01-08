@@ -146,10 +146,12 @@ window.bioEp = {
 
 	// Show the popup
 	showPopup: function() {
-		if(this.shown) return;
+		if (this.shown) return;
 
 		this.bgEl.style.display = "block";
 		this.popupEl.style.display = "block";
+
+		this.shown = true;
 
 		// Handle scaling
 		this.scalePopup();
@@ -157,8 +159,6 @@ window.bioEp = {
 		// Save body overflow value and hide scrollbars
 		this.overflowDefault = document.body.style.overflow;
 		document.body.style.overflow = "hidden";
-
-		this.shown = true;
 		
 		this.cookieManager.create(this.cookieName, "true", this.cookieExp, false);
 		this.cookieManager.create(this.cookieName + "_session", "true", 0, true);
@@ -183,6 +183,8 @@ window.bioEp = {
 
 	// Handle scaling the popup
 	scalePopup: function() {
+		if (!this.shown) return;
+		
 		var margins = { width: 40, height: 40 };
 		var popupSize = { width: bioEp.popupEl.offsetWidth, height: bioEp.popupEl.offsetHeight };
 		var windowSize = { width: window.innerWidth, height: window.innerHeight };
@@ -309,7 +311,7 @@ window.bioEp = {
 			this.removeEvent(document, "touchmove", idleReset);
 			this.removeEvent(document, "MSPointerMove", idleReset);
 			
-			this.showPopup().bind(this);
+			this.showPopup();
 		}.bind(this);
 		
 		// Track if user is using a touch device, then enable the idle listener
