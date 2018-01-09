@@ -186,9 +186,23 @@ window.bioEp = {
 	scalePopup: function() {
 		if (!this.shown) return;
 		
+		var windowSize = { width: window.innerWidth, height: window.innerHeight };
+		var popupClasses = bioEp.popupEl.classList;
+		
+		// Detect screen orientation and reset transform
+		if (windowSize.width > windowSize.height && popupClasses.contains('portrait')) {
+			popupClasses.remove('portrait');
+			bioEp.popupEl.style.transform = "";
+			bioEp.transformDefault = "";
+		}
+		if (windowSize.width < windowSize.height && !popupClasses.contains('portrait')) {
+			popupClasses.add('portrait');
+			bioEp.popupEl.style.transform = "";
+			bioEp.transformDefault = "";
+		}
+		
 		var margins = { width: 40, height: 40 };
 		var popupSize = { width: bioEp.popupEl.offsetWidth, height: bioEp.popupEl.offsetHeight };
-		var windowSize = { width: window.innerWidth, height: window.innerHeight };
 		var newSize = { width: 0, height: 0 };
 		var aspectRatio = popupSize.width / popupSize.height;
 
