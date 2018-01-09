@@ -1,3 +1,6 @@
+/* eslint-env browser */
+/* global bioEp */
+
 window.bioEp = {
 	// Private variables
 	bgEl: {},
@@ -6,6 +9,7 @@ window.bioEp = {
 	shown: false,
 	overflowDefault: "visible",
 	transformDefault: "",
+	idleTimeoutID: null,
 	
 	// Popup options
 	width: 400,
@@ -15,9 +19,13 @@ window.bioEp = {
 	fonts: [],
 	delay: 5,
 	showOnDelay: false,
+	showOnIdle: false,
+	idleTimeout: 10,
 	cookieExp: 30,
+	cookieName: "bioep_shown",
 	showOncePerSession: false,
 	onPopup: null,
+	onClose: null,
 	closeOnBackgroundClick: false,
 	
 	// Object for handling cookies, taken from QuirksMode
@@ -58,22 +66,22 @@ window.bioEp = {
 		}
 	},
 	
-	// Handle the bioep_shown cookie
+	// Handle the cookie
 	// If present and true, return true
 	// If not present or false, create and return false
 	checkCookie: function() {
 		// Handle cookie reset
 		if(this.cookieExp <= 0) {
 			// Handle showing pop up once per browser session.
-			if(this.showOncePerSession && this.cookieManager.get("bioep_shown_session") == "true")
+			if(this.showOncePerSession && this.cookieManager.get(this.cookieName + "_session") == "true")
 				return true;
 
-			this.cookieManager.erase("bioep_shown");
+			this.cookieManager.erase(this.cookieName);
 			return false;
 		}
 
 		// If cookie is set to true
-		if(this.cookieManager.get("bioep_shown") == "true")
+		if(this.cookieManager.get(this.cookieName) == "true")
 			return true;
 
 		return false;
@@ -139,10 +147,12 @@ window.bioEp = {
 
 	// Show the popup
 	showPopup: function() {
-		if(this.shown) return;
+		if (this.shown) return;
 
 		this.bgEl.style.display = "block";
 		this.popupEl.style.display = "block";
+
+		this.shown = true;
 
 		// Handle scaling
 		this.scalePopup();
@@ -150,11 +160,9 @@ window.bioEp = {
 		// Save body overflow value and hide scrollbars
 		this.overflowDefault = document.body.style.overflow;
 		document.body.style.overflow = "hidden";
-
-		this.shown = true;
 		
-		this.cookieManager.create("bioep_shown", "true", this.cookieExp, false);
-		this.cookieManager.create("bioep_shown_session", "true", 0, true);
+		this.cookieManager.create(this.cookieName, "true", this.cookieExp, false);
+		this.cookieManager.create(this.cookieName + "_session", "true", 0, true);
 		
 		if(typeof this.onPopup === "function") {
 			this.onPopup();
@@ -168,10 +176,16 @@ window.bioEp = {
 
 		// Set body overflow back to default to show scrollbars
 		document.body.style.overflow = this.overflowDefault;
+		
+		if(typeof this.onClose === "function") {
+			this.onClose();
+		}
 	},
 
 	// Handle scaling the popup
 	scalePopup: function() {
+		if (!this.shown) return;
+		
 		var margins = { width: 40, height: 40 };
 		var popupSize = { width: bioEp.popupEl.offsetWidth, height: bioEp.popupEl.offsetHeight };
 		var windowSize = { width: window.innerWidth, height: window.innerHeight };
@@ -219,6 +233,12 @@ window.bioEp = {
 		else if(obj.attachEvent)
 			obj.attachEvent("on" + event, callback);
 	},
+	removeEvent: function (obj, event, callback) {
+		if(obj.removeEventListener)
+			obj.removeEventListener(event, callback, false);
+		else if(obj.detachEvent)
+			obj.detachEvent("on" + event, callback);
+	},
 
 	// Load event listeners for the popup
 	loadEvents: function() {
@@ -249,6 +269,59 @@ window.bioEp = {
 			if(!from)
 				bioEp.showPopup();
 		}.bind(this));
+		
+		// Idle detection timer function
+		var idleListen = function() {
+			this.removeEvent(document, 'touchstart', idleListen);
+			
+			this.addEvent(document, "mousemove", idleReset);
+			this.addEvent(document, "mousedown", idleReset);
+			this.addEvent(document, "touchstart", idleReset);
+			this.addEvent(document, "click", idleReset);
+			this.addEvent(document, "scroll", idleReset);
+			this.addEvent(document, "keypress", idleReset);
+			this.addEvent(document, "DOMMouseScroll", idleReset);
+			this.addEvent(document, "mousewheel", idleReset);
+			this.addEvent(document, "touchmove", idleReset);
+			this.addEvent(document, "MSPointerMove", idleReset);
+			
+			idleStart();
+		}.bind(this);
+		
+		var idleStart = function() {
+			if (this.shown) return;
+			this.idleTimeoutID = setTimeout(idleFire, this.idleTimeout * 1000);
+		}.bind(this);
+
+		var idleReset = function() {
+			if (this.shown) return;
+			clearTimeout(this.idleTimeoutID);
+			this.idleTimeoutID = null;
+			idleStart();
+		}.bind(this);
+		
+		var idleFire = function() {
+			this.removeEvent(document, "mousemove", idleReset);
+			this.removeEvent(document, "mousedown", idleReset);
+			this.removeEvent(document, "touchstart", idleReset);
+			this.removeEvent(document, "click", idleReset);
+			this.removeEvent(document, "scroll", idleReset);
+			this.removeEvent(document, "keypress", idleReset);
+			this.removeEvent(document, "DOMMouseScroll", idleReset);
+			this.removeEvent(document, "mousewheel", idleReset);
+			this.removeEvent(document, "touchmove", idleReset);
+			this.removeEvent(document, "MSPointerMove", idleReset);
+			
+			bioEp.showPopup();
+		}.bind(this);
+		
+		// Track if user is using a touch device, then enable the idle listener
+		this.addEvent(document, 'touchstart', idleListen);
+		
+		// Track user interaction events for idle timeout
+		if(this.showOnIdle) {
+			idleListen();
+		}
 
 		// Handle the popup close button
 		this.addEvent(this.closeBtnEl, "click", function() {
@@ -277,9 +350,13 @@ window.bioEp = {
 		this.fonts = (typeof opts.fonts === 'undefined') ? this.fonts : opts.fonts;
 		this.delay = (typeof opts.delay === 'undefined') ? this.delay : opts.delay;
 		this.showOnDelay = (typeof opts.showOnDelay === 'undefined') ? this.showOnDelay : opts.showOnDelay;
+		this.showOnIdle = (typeof opts.showOnIdle === 'undefined') ? this.showOnIdle : opts.showOnIdle;
+		this.idleTimeout = (typeof opts.idleTimeout === 'undefined') ? this.idleTimeout : opts.idleTimeout;
 		this.cookieExp = (typeof opts.cookieExp === 'undefined') ? this.cookieExp : opts.cookieExp;
+		this.cookieName = (typeof opts.cookieName === 'undefined') ? this.cookieName : opts.cookieName;
 		this.showOncePerSession = (typeof opts.showOncePerSession === 'undefined') ? this.showOncePerSession : opts.showOncePerSession;
 		this.onPopup = (typeof opts.onPopup === 'undefined') ? this.onPopup : opts.onPopup;
+		this.onClose = (typeof opts.onClose === 'undefined') ? this.onClose : opts.onClose;
 		this.closeOnBackgroundClick = (typeof opts.closeOnBackgroundClick === 'undefined') ? this.closeOnBackgroundClick : opts.closeOnBackgroundClick;
 	},
 
