@@ -66,23 +66,21 @@ window.bioEp = {
 		}
 	},
 	
-	// Handle the cookie
+	// Handle the cookie based on current config
 	// If present and true, return true
 	// If not present or false, create and return false
 	checkCookie: function() {
-		// Handle cookie reset
-		if(this.cookieExp <= 0) {
-			// Handle showing pop up once per browser session.
-			if(this.showOncePerSession && this.cookieManager.get(this.cookieName + "_session") == "true")
-				return true;
-
-			this.cookieManager.erase(this.cookieName);
-			return false;
+		if (this.showOncePerSession) {
+			return this.cookieManager.get(this.cookieName + "_session") === "true";
 		}
 
-		// If cookie is set to true
-		if(this.cookieManager.get(this.cookieName) == "true")
-			return true;
+		if (this.cookieExp > 0) {
+			return this.cookieManager.get(this.cookieName) === "true";
+		}
+
+		// Clear cookies as no longer needed
+		this.cookieManager.erase(this.cookieName);
+		this.cookieManager.erase(this.cookieName + "_session");
 
 		return false;
 	},
@@ -160,10 +158,15 @@ window.bioEp = {
 		// Save body overflow value and hide scrollbars
 		this.overflowDefault = document.body.style.overflow;
 		document.body.style.overflow = "hidden";
-		
-		this.cookieManager.create(this.cookieName, "true", this.cookieExp, false);
-		this.cookieManager.create(this.cookieName + "_session", "true", 0, true);
-		
+
+		// Create cookie
+		if (this.showOncePerSession) {
+			this.cookieManager.create(this.cookieName + "_session", "true", 0, true);
+		}
+		else if (this.cookieExp > 0) {
+			this.cookieManager.create(this.cookieName, "true", this.cookieExp, false);
+		}
+
 		if(typeof this.onPopup === "function") {
 			this.onPopup();
 		}
