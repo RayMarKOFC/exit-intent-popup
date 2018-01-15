@@ -10,6 +10,8 @@ exit-intent-popup
 * Set a timed delay before the script starts tracking exit intent.
 * Display popup based on exit intent, idle timeout, or timed delay.
 * Scales to adjust to window size.
+* Support for Touch devices with fallback from Exit Intent to Idle.
+* Support for changing layout in Portrait mode
 
 # Usage
 
